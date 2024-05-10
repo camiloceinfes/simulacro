@@ -1,13 +1,16 @@
-from sqlalchemy.orm import sessionmaker
-#from models.models import purchases
-from dotenv import load_dotenv
-from datetime import datetime
-#from db.db import engine
+# from sqlalchemy.orm import sessionmaker
+# #from models.models import purchases
+# from dotenv import load_dotenv
+# from datetime import datetime
+import polars as pl
+import pandas as pd
+from sqlalchemy import text
+import json
 # import uuid
 # import json
 # import os
 
-class example():
+class Simulacros():
   def get_board_averagebyArea(self, code, year, simulacrum, grade):
 
     columns = [
@@ -75,36 +78,112 @@ class example():
     
     return {'columns': columns, 'rows': lista}
   
-  def get_board_subject_classroom(self, code, year, simulacrum, grade ):
+  def get_board_subject_classroom(self, code, year, simulacrum, grade, classroom, db):
 
-    columns = [
-        { 'headerName': 'Grado', 'field': 'grado', 
-        },
-        { 'headerName': 'Salón', 'field': 'salon', 
-        },
-        { 'headerName': 'Prueba', 'field': 'prueba', 
-        },
-        { 'headerName': 'Genéricos', 'field': 'genericos', 
-        },
-        { 'headerName': 'No Genéricos', 'field': 'noGenericos', 
-        },
-        { 'headerName': 'Química', 'field': 'quimica', 
-        },
-        { 'headerName': 'Física', 'field': 'fisica', 
-        },
-        { 'headerName': 'Biología', 'field': 'biologia', 
-        },
-        { 'headerName': 'Ciencia, tecn y soc', 'field': 'cts', 
-        },
-        { 'headerName': 'Lectura Crítica', 'field': 'lecturaCritica', 
-        },
-        { 'headerName': 'Inglés', 'field': 'ingles', 
-        },
-        { 'headerName': 'Definitiva', 'field': 'definitiva', 
-        },
-        { 'headerName': 'Global', 'field': 'global', 
-        },
-      ]
+    procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Simulacros_PromedioColegioSalon"
+  
+    try:
+        query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @Anno=:Anno, @Grado=:Grado, @Salon=:Salon, @Prueba=:Prueba")
+        result = db.execute(query, {"Codigo": code, "Anno": year, "Grado": grade, "Salon": classroom, "Prueba": simulacrum}).fetchall()
+        
+        if len(result) != 0:
+            #return json.loads(result[0][0])
+          #print(result)
+
+          df = pl.DataFrame(result)
+
+          columns = [
+            { 'headerName': 'Grado', 'field': 'grado', 
+            },
+            { 'headerName': 'Salón', 'field': 'salon', 
+            },
+            { 'headerName': 'Prueba', 'field': 'prueba', 
+            },
+            { 'headerName': 'Genéricos', 'field': 'genericos', 
+            },
+            { 'headerName': 'No Genéricos', 'field': 'noGenericos', 
+            },
+            { 'headerName': 'Química', 'field': 'quimica', 
+            },
+            { 'headerName': 'Física', 'field': 'fisica', 
+            },
+            { 'headerName': 'Biología', 'field': 'biologia', 
+            },
+            { 'headerName': 'Ciencia, tecn y soc', 'field': 'cts', 
+            },
+            { 'headerName': 'Sociales', 'field': 'sociales', 
+            },
+            { 'headerName': 'Ciudadanas', 'field': 'ciudadanas', 
+            },
+            { 'headerName': 'Lectura Crítica', 'field': 'lecturaCritica', 
+            },
+            { 'headerName': 'Inglés', 'field': 'ingles', 
+            },
+            { 'headerName': 'Definitiva', 'field': 'definitiva', 
+            },
+            { 'headerName': 'Global', 'field': 'global', 
+            },
+          ]
+          print(result)
+
+          data = {
+                  'Grado': df['column_0'].apply(lambda x: x[0]),
+                  'Salón': df['column_0'].apply(lambda x: x[1]),
+                  'Prueba': df['column_0'].apply(lambda x: x[2]),
+                  'Genéricos': df['column_0'].apply(lambda x: x[3]),
+                  'No Genéricos': df['column_0'].apply(lambda x: x[4]),
+                  'Química': df['column_0'].apply(lambda x: x[5]),
+                  'Física': df['column_0'].apply(lambda x: x[6]),
+                  'Biología': df['column_0'].apply(lambda x: x[7]),
+                  'Ciencia, tecn y soc': df['column_0'].apply(lambda x: x[8]),
+                  'Sociales': df['column_0'].apply(lambda x: x[9]),
+                  'Ciudadanas': df['column_0'].apply(lambda x: x[10]),
+                  'Lectura Crítica': df['column_0'].apply(lambda x: x[11]),
+                  'Inglés': df['column_0'].apply(lambda x: x[12]),
+                  'Definitiva': df['column_0'].apply(lambda x: x[13]),
+                  'Global': df['column_0'].apply(lambda x: x[14]),
+                  'ID': df['column_0'].apply(lambda x: x[15])
+                }
+          
+          new_df = pd.DataFrame(data)
+          new_df = new_df.fillna(0)
+          new_df = new_df.to_dict(orient='records')
+
+          lista = []
+
+          for elemento in new_df:
+          
+              dicc = {
+                      "id": elemento['ID'],
+                      "grado": elemento['Grado'],
+                      "salon": elemento['Salón'],
+                      "prueba": elemento['Prueba'],
+                      "genericos": elemento['Genéricos'],
+                      "noGenericos": elemento['No Genéricos'],
+                      "quimica": elemento['Química'],
+                      "fisica": elemento['Física'],
+                      "biologia": elemento['Biología'],
+                      "cts": elemento['Ciencia, tecn y soc'],
+                      "ciudadanas": elemento['Ciudadanas'],
+                      "lecturaCritica": elemento['Lectura Crítica'],
+                      "ingles": elemento['Inglés'],
+                      "definitiva": elemento['Definitiva'],
+                      "global": elemento['Global'],
+                  }
+          
+              lista.append(dicc)
+
+          #print(lista)
+          return {'columns': columns, 'rows': lista}
+
+          #return 'prueba'
+    
+    except Exception as e:
+        print(f'error {e}')
+        #return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
+        return []
+
+
     
     #lista = []
     

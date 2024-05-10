@@ -1,102 +1,103 @@
 from fastapi import APIRouter, Depends, HTTPException, status, File, UploadFile
 #from db.db import SessionLocal
 from pydantic import BaseModel
-from simulacro.services.services import example
+from simulacro.services.services import Simulacros
+from config.db import SessionLocal
 from sqlalchemy.orm import Session
 import base64
 import os
 
 router = APIRouter()
 
-# def get_db():
-#     db = SessionLocal()
-#     try:
-#         yield db
-#     finally:
-#         db.close()
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
-@router.post("/board/average/area")
+@router.get("/board/average/area")
 async def board_averagebyArea(code: int, year: int, simulacrum: int, grade: int):
     
     try:
-        _answer = example().get_board_averagebyArea(code, year, simulacrum, grade)
+        _answer = Simulacros().get_board_averagebyArea(code, year, simulacrum, grade)
         return _answer
     except Exception as e:
         return []
         #return {"error": str(e)}
 
-@router.post("/board/subject/classroom") 
-async def board_subject_classroom(code: int, year: int, simulacrum: int, grade: int): #, db: Session = Depends(get_db)
+@router.get("/board/subject/classroom") 
+async def board_subject_classroom(code: int, year: int, simulacrum: int, grade: int, classroom: int, db: Session = Depends(get_db)): #, db: Session = Depends(get_db)
     
     try:
-        _answer = example().get_board_subject_classroom(code, year, simulacrum, grade)
+        _answer = Simulacros().get_board_subject_classroom(code, year, simulacrum, grade, classroom, db)
         return _answer
     except Exception as e:
         return []
         #return {"error": str(e)}
 
 
-@router.post("/board/area/performance") 
+@router.get("/board/area/performance") 
 async def board_area_performance(code: int, year: int, simulacrum: int, grade: int): #, db: Session = Depends(get_db)
     
     try:
-        _answer = example().get_board_area_performance(code, year, simulacrum, grade)
+        _answer = Simulacros().get_board_area_performance(code, year, simulacrum, grade)
         return _answer
     except Exception as e:
         return []
         #return {"error": str(e)}
 
-@router.post("/analysisSubject/percentage/students") 
+@router.get("/analysisSubject/percentage/students") 
 async def percentage_students_performanceLvel(code: int, year: int, simulacrum: int, grade: int, classroom: int): #, db: Session = Depends(get_db)
     
     try:
-        _answer = example().get_percentage_students_performanceLvel(code, year, simulacrum, grade, classroom)
+        _answer = Simulacros().get_percentage_students_performanceLvel(code, year, simulacrum, grade, classroom)
         return _answer
     except Exception as e:
         return []
     
-@router.post("/analysisSubject/deviation/subject")
+@router.get("/analysisSubject/deviation/subject")
 async def desviation_subject(code: int, year: int, simulacrum: int, grade: int, classroom: int): #, db: Session = Depends(get_db)
     
     try:
-        _answer = example().get_desviation_subject(code, year, simulacrum, grade, classroom)
+        _answer = Simulacros().get_desviation_subject(code, year, simulacrum, grade, classroom)
         return _answer
     except Exception as e:
         return []
     
-@router.post("/competencies/students/notes")
+@router.get("/competencies/students/notes")
 async def competencies_students_notes(code: int, year: int, simulacrum: int, grade: int, classroom: int, subject: int): #, db: Session = Depends(get_db)
     
     try:
-        _answer = example().get_competencies_students_notes(code, year, simulacrum, grade, classroom, subject)
+        _answer = Simulacros().get_competencies_students_notes(code, year, simulacrum, grade, classroom, subject)
         return _answer
     except Exception as e:
         return []
     
-@router.post("/competencies/deviation/competencies") 
+@router.get("/competencies/deviation/competencies") 
 async def competencies_deviation(code: int, year: int, simulacrum: int, grade: int, classroom: int, subject: int): #, db: Session = Depends(get_db)
     
     try:
-        _answer = example().get_competencies_deviation(code, year, simulacrum, grade, classroom, subject)
+        _answer = Simulacros().get_competencies_deviation(code, year, simulacrum, grade, classroom, subject)
         return _answer
     except Exception as e:
         return []
     
 
-@router.post("/components/students/notes")
+@router.get("/components/students/notes")
 async def components_students_notes(code: int, year: int, simulacrum: int, grade: int, classroom: int, subject: int): #, db: Session = Depends(get_db)
     
     try:
-        _answer = example().get_components_students_notes(code, year, simulacrum, grade, classroom, subject)
+        _answer = Simulacros().get_components_students_notes(code, year, simulacrum, grade, classroom, subject)
         return _answer
     except Exception as e:
         return []
     
-@router.post("/components/deviation/competencies") 
+@router.get("/components/deviation/competencies") 
 async def components_deviation(code: int, year: int, simulacrum: int, grade: int, classroom: int, subject: int): #, db: Session = Depends(get_db)
     
     try:
-        _answer = example().get_components_deviation(code, year, simulacrum, grade, classroom, subject)
+        _answer = Simulacros().get_components_deviation(code, year, simulacrum, grade, classroom, subject)
         return _answer
     except Exception as e:
         return []    
