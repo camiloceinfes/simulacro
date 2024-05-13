@@ -17,10 +17,10 @@ def get_db():
         db.close()
 
 @router.get("/board/average/area")
-async def board_averagebyArea(code: int, year: int, simulacrum: int, grade: int):
+async def board_averagebyArea(code: int, year: int, simulacrum: int, grade: int, classroom: int, db: Session = Depends(get_db)):
     
     try:
-        _answer = Simulacros().get_board_averagebyArea(code, year, simulacrum, grade)
+        _answer = Simulacros().get_board_averagebyArea(code, year, simulacrum, grade, classroom, db)
         return _answer
     except Exception as e:
         return []

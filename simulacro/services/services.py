@@ -11,73 +11,77 @@ import json
 # import os
 
 class Simulacros():
-  def get_board_averagebyArea(self, code, year, simulacrum, grade):
+  def get_board_averagebyArea(self, code, year, simulacrum, grade, classroom, db):
 
-    columns = [
-        { 'headerName': 'Promedio', 'field': 'promedio', 
-        },
-        { 'headerName': 'Matemáticas', 'field': 'matematicas', 
-        },
-        { 'headerName': 'Sociales Y Ciudadanas', 'field': 'socialesCiudadanas', 
-        },
-        { 'headerName': 'Ciencias Naturales', 'field': 'cienciasNaturales', 
-        },
-        { 'headerName': 'Lectura Crítica', 'field': 'lecturaCritica', 
-        },
-        { 'headerName': 'Inglés', 'field': 'ingles', 
-        },
-        { 'headerName': 'Definitiva', 'field': 'definitiva', 
-        },
-        { 'headerName': 'Global', 'field': 'global', 
-        },
-    ]
-    
-    #lista = []
-    
-    lista = [{
-            "id": 1,
-            "promedio": 'Mejores promedios',
-            "matematicas": 90,
-            "socialesCiudadanas": 80,
-            "cienciasNaturales": 70,
-            "lecturaCritica": 60,
-            "ingles": 50,
-            "definitiva": 40
-        },
-        {
-            "id": 2,
-            "promedio": 'Nacional',
-            "matematicas": 90,
-            "socialesCiudadanas": 80,
-            "cienciasNaturales": 70,
-            "lecturaCritica": 60,
-            "ingles": 50,
-            "definitiva": 40
-        },
-        {
-            "id": 3,
-            "promedio": 'Ciudad',
-            "matematicas": 90,
-            "socialesCiudadanas": 80,
-            "cienciasNaturales": 70,
-            "lecturaCritica": 60,
-            "ingles": 50,
-            "definitiva": 40
-        },
-        {
-            "id": 4,
-            "promedio": 'Plantel',
-            "matematicas": 90,
-            "socialesCiudadanas": 80,
-            "cienciasNaturales": 70,
-            "lecturaCritica": 60,
-            "ingles": 50,
-            "definitiva": 40
-        }
-      ]
-    
-    return {'columns': columns, 'rows': lista}
+    procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Simulacros_PromedioColegioArea"
   
+    try:
+      query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @Anno=:Anno, @Grado=:Grado, @Salon=:Salon, @Prueba=:Prueba")
+      result = db.execute(query, {"Codigo": code, "Anno": year, "Grado": grade, "Salon": classroom, "Prueba": simulacrum}).fetchall()
+      
+      #print(result)
+      if len(result) != 0:
+
+        df = pl.DataFrame(result)
+
+        columns = [
+            { 'headerName': 'Promedio', 'field': 'promedio', 
+            },
+            { 'headerName': 'Matemáticas', 'field': 'matematicas',
+            },
+            { 'headerName': 'Ciencias Naturales', 'field': 'cienciasNaturales',  
+            },
+            { 'headerName': 'Sociales Y Ciudadanas', 'field': 'socialesCiudadanas', 
+            },
+            { 'headerName': 'Lectura Crítica', 'field': 'lecturaCritica', 
+            },
+            { 'headerName': 'Inglés', 'field': 'ingles', 
+            },
+            { 'headerName': 'Definitiva', 'field': 'definitiva', 
+            },
+            { 'headerName': 'Global', 'field': 'global', 
+            },
+        ]
+                  
+        data = {
+                'Promedio': df['column_0'].apply(lambda x: x[0]),
+                'Matemáticas': df['column_0'].apply(lambda x: x[1]),
+                'Ciencias Naturales': df['column_0'].apply(lambda x: x[2]),
+                'Sociales Y Ciudadanas': df['column_0'].apply(lambda x: x[3]),
+                'Lectura Crítica': df['column_0'].apply(lambda x: x[4]),
+                'Inglés': df['column_0'].apply(lambda x: x[5]),
+                'Definitiva': df['column_0'].apply(lambda x: x[6]),
+                'Global': df['column_0'].apply(lambda x: x[7]),
+                'ID': df['column_0'].apply(lambda x: x[8])
+              }
+        new_df = pd.DataFrame(data)
+        new_df = new_df.fillna(0)
+        new_df = new_df.to_dict(orient='records')
+
+        lista = []
+
+        for elemento in new_df:
+        
+            dicc = {
+                    "id": elemento['ID'],
+                    "promedio": elemento['Promedio'],
+                    "matematicas": elemento['Matemáticas'],
+                    "cienciasNaturales": elemento['Ciencias Naturales'],
+                    "socialesCiudadanas": elemento['Sociales Y Ciudadanas'],
+                    "lecturaCritica": elemento['Lectura Crítica'],
+                    "ingles": elemento['Inglés'],
+                    "definitiva": elemento['Definitiva'],
+                    "global": elemento['Global']
+                }
+        
+            lista.append(dicc)
+
+        return {'columns': columns, 'rows': lista}
+    except Exception as e:
+        print(f'error {e}')
+        #return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
+        return []
+
   def get_board_subject_classroom(self, code, year, simulacrum, grade, classroom, db):
 
     procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Simulacros_PromedioColegioSalon"
@@ -87,8 +91,6 @@ class Simulacros():
         result = db.execute(query, {"Codigo": code, "Anno": year, "Grado": grade, "Salon": classroom, "Prueba": simulacrum}).fetchall()
         
         if len(result) != 0:
-            #return json.loads(result[0][0])
-          #print(result)
 
           df = pl.DataFrame(result)
 
