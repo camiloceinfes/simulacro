@@ -7,4 +7,4 @@ app = FastAPI()
 
 #pen.Base.metadata.create_all(bind=engine)
 
-app.include_router(router, prefix="/simulacrum", tags=["test"])
+app.include_router(router, prefix="/api", tags=["Simulacro"])

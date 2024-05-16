@@ -11,13 +11,13 @@ import json
 # import os
 
 class Simulacros():
-  def get_board_averagebyArea(self, code, year, simulacrum, grade, classroom, db):
-
+  def average_by_area(self, code, year, test, grade, classroom, db):
+    print('entro aqui');
     procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Simulacros_PromedioColegioArea"
   
     try:
       query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @Anno=:Anno, @Grado=:Grado, @Salon=:Salon, @Prueba=:Prueba")
-      result = db.execute(query, {"Codigo": code, "Anno": year, "Grado": grade, "Salon": classroom, "Prueba": simulacrum}).fetchall()
+      result = db.execute(query, {"Codigo": code, "Anno": year, "Grado": grade, "Salon": classroom, "Prueba": test}).fetchall()
       
       #print(result)
       if len(result) != 0:
@@ -82,13 +82,13 @@ class Simulacros():
         #return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
         return []
 
-  def get_board_subject_classroom(self, code, year, simulacrum, grade, classroom, db):
+  def average_by_subject_classroom(self, code, year, test, grade, classroom, db):
 
     procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Simulacros_PromedioColegioSalon"
   
     try:
         query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @Anno=:Anno, @Grado=:Grado, @Salon=:Salon, @Prueba=:Prueba")
-        result = db.execute(query, {"Codigo": code, "Anno": year, "Grado": grade, "Salon": classroom, "Prueba": simulacrum}).fetchall()
+        result = db.execute(query, {"Codigo": code, "Anno": year, "Grado": grade, "Salon": classroom, "Prueba": test}).fetchall()
         
         if len(result) != 0:
 
@@ -177,90 +177,12 @@ class Simulacros():
 
           #print(lista)
           return {'columns': columns, 'rows': lista}
-
-          #return 'prueba'
-    
     except Exception as e:
         print(f'error {e}')
         #return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
         return []
-
-
-    
-    #lista = []
-    
-    lista = [{
-            "id": 1,
-            "grado": 9,
-            "salon": 2,
-            "Prueba": 'Prueba Pensar',
-            "genericos": 90,
-            "noGenericos": 90,
-            "quimica": 90,
-            "fisica": 90,
-            "biologia": 90,
-            "cts": 90,
-            "lecturaCritica": 60,
-            "ingles": 50,
-            "definitiva": 40,
-            "global": 90,
-        },
-        {
-            "id": 2,
-            "grado": 8,
-            "salon": 2,
-            "Prueba": 'Prueba Pensar',
-            "genericos": 90,
-            "noGenericos": 90,
-            "quimica": 90,
-            "fisica": 90,
-            "biologia": 90,
-            "cts": 90,
-            "lecturaCritica": 60,
-            "ingles": 50,
-            "definitiva": 40,
-            "global": 90,
-        },
-        {
-            "id": 3,
-            "grado": 7,
-            "salon": 2,
-            "Prueba": 'Prueba Pensar',
-            "genericos": 90,
-            "noGenericos": 90,
-            "quimica": 90,
-            "fisica": 90,
-            "biologia": 90,
-            "cts": 90,
-            "lecturaCritica": 60,
-            "ingles": 50,
-            "definitiva": 40,
-            "global": 90,
-        },
-        {
-            "id": 4,
-            "grado": 6,
-            "salon": 2,
-            "Prueba": 'Prueba Pensar',
-            "genericos": 90,
-            "noGenericos": 90,
-            "quimica": 90,
-            "fisica": 90,
-            "biologia": 90,
-            "cts": 90,
-            "lecturaCritica": 60,
-            "ingles": 50,
-            "definitiva": 40,
-            "global": 90,
-          }
-        ]
-    
-    return {'columns': columns, 'rows': lista}
   
-  def get_board_area_performance(self, code, year, simulacrum, grade):
-
-    #labels = []; datasets = []; label = []; data = []
-    
+  def area_performance(self, code, year, test, grade):
     data = {
             "labels":[
                 "Ciencias naturales",
@@ -278,7 +200,7 @@ class Simulacros():
           }
     return data
 
-  def get_percentage_students_performanceLvel(self, code, year, simulacrum, grade, classroom):
+  def performance_level_by_students(self, code, year, test, grade, classroom):
 
     data = {
       'totalStudents': 'number',
@@ -312,7 +234,7 @@ class Simulacros():
   
     return data
   
-  def get_desviation_subject(self, code, year, simulacrum, grade, classroom):
+  def desviation_by_subject(self, code, year, test, grade, classroom):
 
     columns = [
         { 'headerName': 'Materia', 'field': 'materia', 
@@ -365,7 +287,7 @@ class Simulacros():
     
     return {'columns': columns, 'rows': lista}
   
-  def get_competencies_students_notes(self, code, year, simulacrum, grade, classroom, subject):
+  def notes_by_competencies(self, code, year, test, grade, classroom, subject):
 
     columns = [
         { 'headerName': 'Estudiante', 'field': 'estudiante', 
@@ -434,7 +356,7 @@ class Simulacros():
 
     return {'columns': columns, 'rows': lista}
   
-  def get_competencies_deviation(self, code, year, simulacrum, grade, classroom, subject):
+  def desviation_by_competencies(self, code, year, test, grade, classroom, subject):
 
     columns = [
         { 'headerName': 'Materia', 'field': 'materia', 
@@ -515,7 +437,7 @@ class Simulacros():
 
     return {'columns': columns, 'rows': lista}
   
-  def get_components_students_notes(self, code, year, simulacrum, grade, classroom, subject):
+  def notes_by_components(self, code, year, test, grade, classroom, subject):
 
     columns = [
         { 'headerName': 'Estudiante', 'field': 'estudiante', 
@@ -584,7 +506,7 @@ class Simulacros():
 
     return {'columns': columns, 'rows': lista}
   
-  def get_components_deviation(self, code, year, simulacrum, grade, classroom, subject):
+  def desviation_by_components(self, code, year, test, grade, classroom, subject):
 
     columns = [
         { 'headerName': 'Materia', 'field': 'materia', 
