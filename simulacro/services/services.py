@@ -1,16 +1,46 @@
-# from sqlalchemy.orm import sessionmaker
-# #from models.models import purchases
-# from dotenv import load_dotenv
-# from datetime import datetime
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import text
 import polars as pl
 import pandas as pd
-from sqlalchemy import text
 import json
-# import uuid
-# import json
-# import os
 
 class Simulacros():
+
+  def get_global_params(self, code, year, db):
+      procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_EnlazaaParametrosGenerales"
+      
+      try:
+          query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @Anno=:Anno")
+          result = db.execute(query, {"Codigo": code, "Anno": year }).fetchall()
+
+          #print(json.loads(result[0][0]))
+          #result = json.loads(result[0][0])
+          result_iterable = json.loads(result[0][0])['grades']
+
+          lista = []
+          list_cycles = []
+          unique_list = []
+          for i in result_iterable:
+              lista.append(i['scholarcycle']['name'])
+
+          for j in lista:
+              if j not in unique_list:
+                  unique_list.append(j)
+          for i in unique_list: 
+              cycles = {'id': unique_list.index(i)+1, "name": i, "alias": i}
+              list_cycles.append(cycles)
+          
+          cycles = {'cycles': list_cycles}
+
+          result_dict = json.loads(result[0][0])
+          result_dict.update(cycles)
+
+          return result_dict
+      
+      except Exception as e:
+          print(f'error {e}')
+          raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
+      
   def get_board_averagebyArea(self, code, year, simulacrum, grade, classroom, db):
 
     procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Simulacros_PromedioColegioArea"
@@ -79,8 +109,7 @@ class Simulacros():
         return {'columns': columns, 'rows': lista}
     except Exception as e:
         print(f'error {e}')
-        #return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
-        return []
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error")
 
   def get_board_subject_classroom(self, code, year, simulacrum, grade, classroom, db):
 
@@ -126,7 +155,7 @@ class Simulacros():
             { 'headerName': 'Global', 'field': 'global', 
             },
           ]
-          print(result)
+          #print(result)
 
           data = {
                   'Grado': df['column_0'].apply(lambda x: x[0]),
