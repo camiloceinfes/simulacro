@@ -5,49 +5,13 @@ import pandas as pd
 import json
 
 class Simulacros():
-
-  def get_global_params(self, code, year, db):
-      procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_EnlazaaParametrosGenerales"
-      
-      try:
-          query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @Anno=:Anno")
-          result = db.execute(query, {"Codigo": code, "Anno": year }).fetchall()
-
-          #print(json.loads(result[0][0]))
-          #result = json.loads(result[0][0])
-          result_iterable = json.loads(result[0][0])['grades']
-
-          lista = []
-          list_cycles = []
-          unique_list = []
-          for i in result_iterable:
-              lista.append(i['scholarcycle']['name'])
-
-          for j in lista:
-              if j not in unique_list:
-                  unique_list.append(j)
-          for i in unique_list: 
-              cycles = {'id': unique_list.index(i)+1, "name": i, "alias": i}
-              list_cycles.append(cycles)
-          
-          cycles = {'cycles': list_cycles}
-
-          result_dict = json.loads(result[0][0])
-          result_dict.update(cycles)
-
-          return result_dict
-      
-      except Exception as e:
-          print(f'error {e}')
-          raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
-      
   def get_board_averagebyArea(self, code, year, simulacrum, grade, classroom, db):
 
     procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Simulacros_PromedioColegioArea"
   
     try:
       query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @Anno=:Anno, @Grado=:Grado, @Salon=:Salon, @Prueba=:Prueba")
-      result = db.execute(query, {"Codigo": code, "Anno": year, "Grado": grade, "Salon": classroom, "Prueba": simulacrum}).fetchall()
+      result = db.execute(query, {"Codigo": code, "Anno": year, "Grado": grade, "Salon": classroom, "Prueba": test}).fetchall()
       
       #print(result)
       if len(result) != 0:
@@ -111,13 +75,13 @@ class Simulacros():
         print(f'error {e}')
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error")
 
-  def get_board_subject_classroom(self, code, year, simulacrum, grade, classroom, db):
+  def average_by_subject_classroom(self, code, year, test, grade, classroom, db):
 
     procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Simulacros_PromedioColegioSalon"
   
     try:
         query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @Anno=:Anno, @Grado=:Grado, @Salon=:Salon, @Prueba=:Prueba")
-        result = db.execute(query, {"Codigo": code, "Anno": year, "Grado": grade, "Salon": classroom, "Prueba": simulacrum}).fetchall()
+        result = db.execute(query, {"Codigo": code, "Anno": year, "Grado": grade, "Salon": classroom, "Prueba": test}).fetchall()
         
         if len(result) != 0:
 
@@ -206,12 +170,82 @@ class Simulacros():
 
           #print(lista)
           return {'columns': columns, 'rows': lista}
-
-          #return 'prueba'
-    
     except Exception as e:
         print(f'error {e}')
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
+        #return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
+        return []
+
+
+    
+    #lista = []
+    
+    lista = [{
+            "id": 1,
+            "grado": 9,
+            "salon": 2,
+            "Prueba": 'Prueba Pensar',
+            "genericos": 90,
+            "noGenericos": 90,
+            "quimica": 90,
+            "fisica": 90,
+            "biologia": 90,
+            "cts": 90,
+            "lecturaCritica": 60,
+            "ingles": 50,
+            "definitiva": 40,
+            "global": 90,
+        },
+        {
+            "id": 2,
+            "grado": 8,
+            "salon": 2,
+            "Prueba": 'Prueba Pensar',
+            "genericos": 90,
+            "noGenericos": 90,
+            "quimica": 90,
+            "fisica": 90,
+            "biologia": 90,
+            "cts": 90,
+            "lecturaCritica": 60,
+            "ingles": 50,
+            "definitiva": 40,
+            "global": 90,
+        },
+        {
+            "id": 3,
+            "grado": 7,
+            "salon": 2,
+            "Prueba": 'Prueba Pensar',
+            "genericos": 90,
+            "noGenericos": 90,
+            "quimica": 90,
+            "fisica": 90,
+            "biologia": 90,
+            "cts": 90,
+            "lecturaCritica": 60,
+            "ingles": 50,
+            "definitiva": 40,
+            "global": 90,
+        },
+        {
+            "id": 4,
+            "grado": 6,
+            "salon": 2,
+            "Prueba": 'Prueba Pensar',
+            "genericos": 90,
+            "noGenericos": 90,
+            "quimica": 90,
+            "fisica": 90,
+            "biologia": 90,
+            "cts": 90,
+            "lecturaCritica": 60,
+            "ingles": 50,
+            "definitiva": 40,
+            "global": 90,
+          }
+        ]
+    
+    return {'columns': columns, 'rows': lista}
   
   def get_board_area_performance(self, code, year, simulacrum, grade):
 
@@ -234,17 +268,9 @@ class Simulacros():
           }
     return data
 
-  def get_percentage_students_performanceLvel(self, code, simulacrum, grade, classroom, db):
-
-    procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Simulacros_PorcentajeEstudiantePorNivelDesempeno"
-  
+  def get_percentage_students_performanceLvel(self, code, year, simulacrum, grade, classroom):
+          
     try:
-        query = text(f"EXEC {procedure_name} @Codigo=:Codigo,  @Prueba=:Prueba, @Grado=:Grado, @Salon=:Salon")
-        result = db.execute(query, {"Codigo": code, "Grado": grade, "Salon": classroom, "Prueba": simulacrum}).fetchall()
-
-        print(result)
-
-        if len(result) != 0:
 
           data = {
             'totalStudents': 'number',
@@ -282,7 +308,7 @@ class Simulacros():
         print(f'error {e}')
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
   
-  def get_desviation_subject(self, code, year, simulacrum, grade, classroom):
+  def desviation_by_subject(self, code, year, test, grade, classroom):
 
     columns = [
         { 'headerName': 'Materia', 'field': 'materia', 
@@ -335,7 +361,7 @@ class Simulacros():
     
     return {'columns': columns, 'rows': lista}
   
-  def get_competencies_students_notes(self, code, year, simulacrum, grade, classroom, subject):
+  def notes_by_competencies(self, code, year, test, grade, classroom, subject):
 
     columns = [
         { 'headerName': 'Estudiante', 'field': 'estudiante', 
@@ -404,7 +430,7 @@ class Simulacros():
 
     return {'columns': columns, 'rows': lista}
   
-  def get_competencies_deviation(self, code, year, simulacrum, grade, classroom, subject):
+  def desviation_by_competencies(self, code, year, test, grade, classroom, subject):
 
     columns = [
         { 'headerName': 'Materia', 'field': 'materia', 
@@ -485,7 +511,7 @@ class Simulacros():
 
     return {'columns': columns, 'rows': lista}
   
-  def get_components_students_notes(self, code, year, simulacrum, grade, classroom, subject):
+  def notes_by_components(self, code, year, test, grade, classroom, subject):
 
     columns = [
         { 'headerName': 'Estudiante', 'field': 'estudiante', 
@@ -554,7 +580,7 @@ class Simulacros():
 
     return {'columns': columns, 'rows': lista}
   
-  def get_components_deviation(self, code, year, simulacrum, grade, classroom, subject):
+  def desviation_by_components(self, code, year, test, grade, classroom, subject):
 
     columns = [
         { 'headerName': 'Materia', 'field': 'materia', 
