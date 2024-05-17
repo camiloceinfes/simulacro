@@ -211,80 +211,7 @@ class Simulacros():
     
     except Exception as e:
         print(f'error {e}')
-        #return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
-        return []
-
-
-    
-    #lista = []
-    
-    lista = [{
-            "id": 1,
-            "grado": 9,
-            "salon": 2,
-            "Prueba": 'Prueba Pensar',
-            "genericos": 90,
-            "noGenericos": 90,
-            "quimica": 90,
-            "fisica": 90,
-            "biologia": 90,
-            "cts": 90,
-            "lecturaCritica": 60,
-            "ingles": 50,
-            "definitiva": 40,
-            "global": 90,
-        },
-        {
-            "id": 2,
-            "grado": 8,
-            "salon": 2,
-            "Prueba": 'Prueba Pensar',
-            "genericos": 90,
-            "noGenericos": 90,
-            "quimica": 90,
-            "fisica": 90,
-            "biologia": 90,
-            "cts": 90,
-            "lecturaCritica": 60,
-            "ingles": 50,
-            "definitiva": 40,
-            "global": 90,
-        },
-        {
-            "id": 3,
-            "grado": 7,
-            "salon": 2,
-            "Prueba": 'Prueba Pensar',
-            "genericos": 90,
-            "noGenericos": 90,
-            "quimica": 90,
-            "fisica": 90,
-            "biologia": 90,
-            "cts": 90,
-            "lecturaCritica": 60,
-            "ingles": 50,
-            "definitiva": 40,
-            "global": 90,
-        },
-        {
-            "id": 4,
-            "grado": 6,
-            "salon": 2,
-            "Prueba": 'Prueba Pensar',
-            "genericos": 90,
-            "noGenericos": 90,
-            "quimica": 90,
-            "fisica": 90,
-            "biologia": 90,
-            "cts": 90,
-            "lecturaCritica": 60,
-            "ingles": 50,
-            "definitiva": 40,
-            "global": 90,
-          }
-        ]
-    
-    return {'columns': columns, 'rows': lista}
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
   
   def get_board_area_performance(self, code, year, simulacrum, grade):
 
@@ -307,39 +234,53 @@ class Simulacros():
           }
     return data
 
-  def get_percentage_students_performanceLvel(self, code, year, simulacrum, grade, classroom):
+  def get_percentage_students_performanceLvel(self, code, simulacrum, grade, classroom, db):
 
-    data = {
-      'totalStudents': 'number',
-      'data': {
-      'title': 'string',
-      'labels': [ 'Razonamiento', 'Conocimientos', 'Quimica', 'Fisica'],
-      'datasets': [
-          {
-            'label': 'Bajo',
-            'data': [0, 20, 30, 40],
-            'backgroundColor': '#DC3D3D',
-          },
-          {
-            'label': 'Básico',
-            'data': [0, 20, 30, 40],
-            'backgroundColor': '#E27E1E',
-          },
-          {
-            'label': 'Alto',
-            'data': [0, 20, 30, 40],
-            'backgroundColor': 'rgba(241, 204, 48, 1)',
-          },
-              {
-            'label': 'Superior',
-            'data': [0, 20, 30, 40],
-            'backgroundColor': 'rgba(146, 185, 59, 0.7)',
-          },
-        ]
-      }
-    }
+    procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Simulacros_PorcentajeEstudiantePorNivelDesempeno"
   
-    return data
+    try:
+        query = text(f"EXEC {procedure_name} @Codigo=:Codigo,  @Prueba=:Prueba, @Grado=:Grado, @Salon=:Salon")
+        result = db.execute(query, {"Codigo": code, "Grado": grade, "Salon": classroom, "Prueba": simulacrum}).fetchall()
+
+        print(result)
+
+        if len(result) != 0:
+
+          data = {
+            'totalStudents': 'number',
+            'data': {
+            'title': 'string',
+            'labels': [ 'Razonamiento', 'Conocimientos', 'Quimica', 'Fisica'],
+            'datasets': [
+                {
+                  'label': 'Bajo',
+                  'data': [0, 20, 30, 40],
+                  'backgroundColor': '#DC3D3D',
+                },
+                {
+                  'label': 'Básico',
+                  'data': [0, 20, 30, 40],
+                  'backgroundColor': '#E27E1E',
+                },
+                {
+                  'label': 'Alto',
+                  'data': [0, 20, 30, 40],
+                  'backgroundColor': 'rgba(241, 204, 48, 1)',
+                },
+                    {
+                  'label': 'Superior',
+                  'data': [0, 20, 30, 40],
+                  'backgroundColor': 'rgba(146, 185, 59, 0.7)',
+                },
+              ]
+            }
+          }
+        
+          return data
+        
+    except Exception as e:
+        print(f'error {e}')
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
   
   def get_desviation_subject(self, code, year, simulacrum, grade, classroom):
 
