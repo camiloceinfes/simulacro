@@ -5,8 +5,8 @@ import pandas as pd
 import json
 
 class Simulacros():
-  def get_board_averagebyArea(self, code, year, simulacrum, grade, classroom, db):
-
+  def average_by_area(self, code, year, test, grade, classroom, db):
+    #print('entro aqui');
     procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Simulacros_PromedioColegioArea"
   
     try:
@@ -172,85 +172,9 @@ class Simulacros():
           return {'columns': columns, 'rows': lista}
     except Exception as e:
         print(f'error {e}')
-        #return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
-        return []
-
-
-    
-    #lista = []
-    
-    lista = [{
-            "id": 1,
-            "grado": 9,
-            "salon": 2,
-            "Prueba": 'Prueba Pensar',
-            "genericos": 90,
-            "noGenericos": 90,
-            "quimica": 90,
-            "fisica": 90,
-            "biologia": 90,
-            "cts": 90,
-            "lecturaCritica": 60,
-            "ingles": 50,
-            "definitiva": 40,
-            "global": 90,
-        },
-        {
-            "id": 2,
-            "grado": 8,
-            "salon": 2,
-            "Prueba": 'Prueba Pensar',
-            "genericos": 90,
-            "noGenericos": 90,
-            "quimica": 90,
-            "fisica": 90,
-            "biologia": 90,
-            "cts": 90,
-            "lecturaCritica": 60,
-            "ingles": 50,
-            "definitiva": 40,
-            "global": 90,
-        },
-        {
-            "id": 3,
-            "grado": 7,
-            "salon": 2,
-            "Prueba": 'Prueba Pensar',
-            "genericos": 90,
-            "noGenericos": 90,
-            "quimica": 90,
-            "fisica": 90,
-            "biologia": 90,
-            "cts": 90,
-            "lecturaCritica": 60,
-            "ingles": 50,
-            "definitiva": 40,
-            "global": 90,
-        },
-        {
-            "id": 4,
-            "grado": 6,
-            "salon": 2,
-            "Prueba": 'Prueba Pensar',
-            "genericos": 90,
-            "noGenericos": 90,
-            "quimica": 90,
-            "fisica": 90,
-            "biologia": 90,
-            "cts": 90,
-            "lecturaCritica": 60,
-            "ingles": 50,
-            "definitiva": 40,
-            "global": 90,
-          }
-        ]
-    
-    return {'columns': columns, 'rows': lista}
+        return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
   
-  def get_board_area_performance(self, code, year, simulacrum, grade):
-
-    #labels = []; datasets = []; label = []; data = []
-    
+  def area_performance(self, code, year, test, grade):
     data = {
             "labels":[
                 "Ciencias naturales",
@@ -269,46 +193,40 @@ class Simulacros():
     return data
 
   def get_percentage_students_performanceLvel(self, code, year, simulacrum, grade, classroom):
-          
-    try:
 
-          data = {
-            'totalStudents': 'number',
-            'data': {
-            'title': 'string',
-            'labels': [ 'Razonamiento', 'Conocimientos', 'Quimica', 'Fisica'],
-            'datasets': [
-                {
-                  'label': 'Bajo',
-                  'data': [0, 20, 30, 40],
-                  'backgroundColor': '#DC3D3D',
-                },
-                {
-                  'label': 'Básico',
-                  'data': [0, 20, 30, 40],
-                  'backgroundColor': '#E27E1E',
-                },
-                {
-                  'label': 'Alto',
-                  'data': [0, 20, 30, 40],
-                  'backgroundColor': 'rgba(241, 204, 48, 1)',
-                },
-                    {
-                  'label': 'Superior',
-                  'data': [0, 20, 30, 40],
-                  'backgroundColor': 'rgba(146, 185, 59, 0.7)',
-                },
-              ]
-            }
-          }
-        
-          return data
-        
-    except Exception as e:
-        print(f'error {e}')
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
+    data = {
+      'totalStudents': 'number',
+      'data': {
+      'title': 'string',
+      'labels': [ 'Razonamiento', 'Conocimientos', 'Quimica', 'Fisica'],
+      'datasets': [
+          {
+            'label': 'Bajo',
+            'data': [0, 20, 30, 40],
+            'backgroundColor': '#DC3D3D',
+          },
+          {
+            'label': 'Básico',
+            'data': [0, 20, 30, 40],
+            'backgroundColor': '#E27E1E',
+          },
+          {
+            'label': 'Alto',
+            'data': [0, 20, 30, 40],
+            'backgroundColor': 'rgba(241, 204, 48, 1)',
+          },
+              {
+            'label': 'Superior',
+            'data': [0, 20, 30, 40],
+            'backgroundColor': 'rgba(146, 185, 59, 0.7)',
+          },
+        ]
+      }
+    }
   
-  def desviation_by_subject(self, code, year, test, grade, classroom):
+    return data
+  
+  def get_desviation_subject(self, code, year, simulacrum, grade, classroom):
 
     columns = [
         { 'headerName': 'Materia', 'field': 'materia', 

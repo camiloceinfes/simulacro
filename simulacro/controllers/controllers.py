@@ -20,18 +20,21 @@ def get_db():
     finally:
         db.close()
 
-@router.get("/board/average/area")
-async def board_averagebyArea(code: int, year: int, simulacrum: int, grade: int, classroom: int, db: Session = Depends(get_db)):
-    
-    try:
-        _answer = Simulacros().get_board_averagebyArea(code, year, simulacrum, grade, classroom, db)
-        return _answer
-    except Exception as e:
-        return []
-        #return {"error": str(e)}
+@router.get("/average/area", status_code=status.HTTP_200_OK, responses={
+    200: {"description": "Successful Response"},
+    404: {"description": "Resource not found"},
+    500: {"description": "Internal Server Error"}
+}) #dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))],)
+async def average_by_area(code: int, year: int, test: int, grade: int, classroom: int, db: Session = Depends(get_db)):
+    answer = Simulacros().average_by_area(code, year, test, grade, classroom, db)
+    return answer
 
-@router.get("/board/subject/classroom") 
-async def board_subject_classroom(code: int, year: int, simulacrum: int, grade: int, classroom: int, db: Session = Depends(get_db)): #, db: Session = Depends(get_db)
+@router.get("/average/subject/classroom", status_code=status.HTTP_200_OK, responses={
+    200: {"description": "Successful Response"},
+    404: {"description": "Resource not found"},
+    500: {"description": "Internal Server Error"}
+}) #dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))],) 
+async def average_by_subject_classroom(code: int, year: int, test: int, grade: int, classroom: int, db: Session = Depends(get_db)): #, db: Session = Depends(get_db)
     
     try:
         _answer = Simulacros().average_by_subject_classroom(code, year, test, grade, classroom, db)
@@ -39,8 +42,12 @@ async def board_subject_classroom(code: int, year: int, simulacrum: int, grade: 
     except Exception as e:
         return []
 
-@router.get("/board/area/performance") 
-async def board_area_performance(code: int, year: int, simulacrum: int, grade: int): #, db: Session = Depends(get_db)
+@router.get("/area/performance", status_code=status.HTTP_200_OK, responses={
+    200: {"description": "Successful Response"},
+    404: {"description": "Resource not found"},
+    500: {"description": "Internal Server Error"}
+}) #dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))],) 
+async def area_performance(code: int, year: int, test: int, grade: int): #, db: Session = Depends(get_db)
     
     try:
         _answer = Simulacros().area_performance(code, year, test, grade)
@@ -49,17 +56,25 @@ async def board_area_performance(code: int, year: int, simulacrum: int, grade: i
         return []
     
 
-@router.get("/analysisSubject/percentage/students") 
-async def percentage_students_performanceLvel(code: int, year: int, simulacrum: int, grade: int, classroom: int): #, db: Session = Depends(get_db)
+@router.get("/performance-level/students", status_code=status.HTTP_200_OK, responses={
+    200: {"description": "Successful Response"},
+    404: {"description": "Resource not found"},
+    500: {"description": "Internal Server Error"}
+}) #dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))],) 
+async def performance_level_by_students(code: int, year: int, test: int, grade: int, classroom: int): #, db: Session = Depends(get_db)
     
     try:
-        _answer = Simulacros().get_percentage_students_performanceLvel(code, year, simulacrum, grade, classroom)
+        _answer = Simulacros().performance_level_by_students(code, year, test, grade, classroom)
         return _answer
     except Exception as e:
         return []
     
-@router.get("/analysisSubject/deviation/subject")
-async def desviation_subject(code: int, year: int, simulacrum: int, grade: int, classroom: int): #, db: Session = Depends(get_db)
+@router.get("/desviation/subject", status_code=status.HTTP_200_OK, responses={
+    200: {"description": "Successful Response"},
+    404: {"description": "Resource not found"},
+    500: {"description": "Internal Server Error"}
+}) #dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))],)
+async def desviation_by_subject(code: int, year: int, test: int, grade: int, classroom: int): #, db: Session = Depends(get_db)
     
     try:
         _answer = Simulacros().desviation_by_subject(code, year, test, grade, classroom)
@@ -67,8 +82,12 @@ async def desviation_subject(code: int, year: int, simulacrum: int, grade: int, 
     except Exception as e:
         return []
     
-@router.get("/competencies/students/notes")
-async def competencies_students_notes(code: int, year: int, simulacrum: int, grade: int, classroom: int, subject: int): #, db: Session = Depends(get_db)
+@router.get("/notes/competencies", status_code=status.HTTP_200_OK, responses={
+    200: {"description": "Successful Response"},
+    404: {"description": "Resource not found"},
+    500: {"description": "Internal Server Error"}
+}) #dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))],)
+async def notes_by_competencies(code: int, year: int, test: int, grade: int, classroom: int, subject: int): #, db: Session = Depends(get_db)
     
     try:
         _answer = Simulacros().notes_by_competencies(code, year, test, grade, classroom, subject)
@@ -76,8 +95,12 @@ async def competencies_students_notes(code: int, year: int, simulacrum: int, gra
     except Exception as e:
         return []
     
-@router.get("/competencies/deviation/competencies") 
-async def competencies_deviation(code: int, year: int, simulacrum: int, grade: int, classroom: int, subject: int): #, db: Session = Depends(get_db)
+@router.get("/desviation/competencies", status_code=status.HTTP_200_OK, responses={
+    200: {"description": "Successful Response"},
+    404: {"description": "Resource not found"},
+    500: {"description": "Internal Server Error"}
+}) #dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))],) 
+async def desviation_by_competencies(code: int, year: int, test: int, grade: int, classroom: int, subject: int): #, db: Session = Depends(get_db)
     
     try:
         _answer = Simulacros().desviation_by_competencies(code, year, test, grade, classroom, subject)
@@ -85,9 +108,12 @@ async def competencies_deviation(code: int, year: int, simulacrum: int, grade: i
     except Exception as e:
         return []
     
-
-@router.get("/components/students/notes")
-async def components_students_notes(code: int, year: int, simulacrum: int, grade: int, classroom: int, subject: int): #, db: Session = Depends(get_db)
+@router.get("/notes/components", status_code=status.HTTP_200_OK, responses={
+    200: {"description": "Successful Response"},
+    404: {"description": "Resource not found"},
+    500: {"description": "Internal Server Error"}
+}) #dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))],)
+async def notes_by_components(code: int, year: int, test: int, grade: int, classroom: int, subject: int): #, db: Session = Depends(get_db)
     
     try:
         _answer = Simulacros().notes_by_components(code, year, test, grade, classroom, subject)
@@ -95,8 +121,12 @@ async def components_students_notes(code: int, year: int, simulacrum: int, grade
     except Exception as e:
         return []
     
-@router.get("/components/deviation/competencies") 
-async def components_deviation(code: int, year: int, simulacrum: int, grade: int, classroom: int, subject: int): #, db: Session = Depends(get_db)
+@router.get("/desviation/components", status_code=status.HTTP_200_OK, responses={
+    200: {"description": "Successful Response"},
+    404: {"description": "Resource not found"},
+    500: {"description": "Internal Server Error"}
+}) #dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))],) 
+async def desviation_by_components(code: int, year: int, test: int, grade: int, classroom: int, subject: int): #, db: Session = Depends(get_db)
     
     try:
         _answer = Simulacros().desviation_by_components(code, year, test, grade, classroom, subject)
