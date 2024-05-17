@@ -61,10 +61,10 @@ async def area_performance(code: int, year: int, test: int, grade: int): #, db: 
     404: {"description": "Resource not found"},
     500: {"description": "Internal Server Error"}
 }) #dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))],) 
-async def performance_level_by_students(code: int, year: int, test: int, grade: int, classroom: int): #, db: Session = Depends(get_db)
+async def performance_level_by_students(code: int, year: int, test: int, grade: int, classroom: int, db: Session = Depends(get_db)): #, db: Session = Depends(get_db)
     
     try:
-        _answer = Simulacros().performance_level_by_students(code, year, test, grade, classroom)
+        _answer = Simulacros().performance_level_by_students(code, year, test, grade, classroom, db)
         return _answer
     except Exception as e:
         return []
@@ -74,10 +74,10 @@ async def performance_level_by_students(code: int, year: int, test: int, grade: 
     404: {"description": "Resource not found"},
     500: {"description": "Internal Server Error"}
 }) #dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))],)
-async def desviation_by_subject(code: int, year: int, test: int, grade: int, classroom: int): #, db: Session = Depends(get_db)
+async def desviation_by_subject(code: int, year: int, test: int, grade: int, classroom: int, db: Session = Depends(get_db)): #, db: Session = Depends(get_db)
     
     try:
-        _answer = Simulacros().desviation_by_subject(code, year, test, grade, classroom)
+        _answer = Simulacros().desviation_by_subject(code, year, test, grade, classroom, db)
         return _answer
     except Exception as e:
         return []
@@ -87,10 +87,10 @@ async def desviation_by_subject(code: int, year: int, test: int, grade: int, cla
     404: {"description": "Resource not found"},
     500: {"description": "Internal Server Error"}
 }) #dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))],)
-async def notes_by_competencies(code: int, year: int, test: int, grade: int, classroom: int, subject: int): #, db: Session = Depends(get_db)
+async def notes_by_competencies(code: int, year: int, test: int, grade: int, classroom: int, subject: int, ID_student: int, db: Session = Depends(get_db)): #, db: Session = Depends(get_db)
     
     try:
-        _answer = Simulacros().notes_by_competencies(code, year, test, grade, classroom, subject)
+        _answer = Simulacros().notes_by_competencies(code, year, test, grade, classroom, subject, ID_student, db)
         return _answer
     except Exception as e:
         return []

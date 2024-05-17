@@ -119,7 +119,6 @@ class Simulacros():
             { 'headerName': 'Global', 'field': 'global', 
             },
           ]
-          #print(result)
 
           data = {
                   'Grado': df['column_0'].apply(lambda x: x[0]),
@@ -168,7 +167,7 @@ class Simulacros():
           
               lista.append(dicc)
 
-          #print(lista)
+
           return {'columns': columns, 'rows': lista}
     except Exception as e:
         print(f'error {e}')
@@ -192,161 +191,152 @@ class Simulacros():
           }
     return data
 
-  def get_percentage_students_performanceLvel(self, code, year, simulacrum, grade, classroom):
+  def performance_level_by_students(self, code, year, test, grade, classroom, db):
 
-    data = {
-      'totalStudents': 'number',
-      'data': {
-      'title': 'string',
-      'labels': [ 'Razonamiento', 'Conocimientos', 'Quimica', 'Fisica'],
-      'datasets': [
-          {
-            'label': 'Bajo',
-            'data': [0, 20, 30, 40],
-            'backgroundColor': '#DC3D3D',
-          },
-          {
-            'label': 'Básico',
-            'data': [0, 20, 30, 40],
-            'backgroundColor': '#E27E1E',
-          },
-          {
-            'label': 'Alto',
-            'data': [0, 20, 30, 40],
-            'backgroundColor': 'rgba(241, 204, 48, 1)',
-          },
+    procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Simulacros_PorcentajeEstudiantePorNivelDesempeno"
+  
+    try:
+
+      query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @Anno=:Anno, @Prueba=:Prueba, @Grado=:Grado, @Salon=:Salon")
+      result = db.execute(query, {"Codigo": code, "Anno": year, "Grado": grade, "Salon": classroom, "Prueba": test}).fetchall()
+
+      if len(result) != 0:
+        #print(result)
+        data = {
+          'totalStudents': 'number',
+          'data': {
+          'title': 'string',
+          'labels': ['Razonamiento', 'Conocimientos', 'Quimica', 'Fisica'],
+          'datasets': [
               {
-            'label': 'Superior',
-            'data': [0, 20, 30, 40],
-            'backgroundColor': 'rgba(146, 185, 59, 0.7)',
-          },
-        ]
-      }
-    }
-  
-    return data
-  
-  def get_desviation_subject(self, code, year, simulacrum, grade, classroom):
-
-    columns = [
-        { 'headerName': 'Materia', 'field': 'materia', 
-        },
-        { 'headerName': 'Promedio', 'field': 'promedio', 
-        },
-        { 'headerName': 'Desviación', 'field': 'desviacion', 
-        },
-        { 'headerName': 'Min. Valor', 'field': 'valorMinimo', 
-        },
-        { 'headerName': 'Max. Valor', 'field': 'valorMaximo', 
-        },
-      ]
-    
-    #lista = []
-    
-    lista = [{
-            "id": 1,
-            "materia": 'Inglés',
-            "promedio": 90,
-            "desviacion": 80,
-            "valorMinimo": 70,
-            "valorMaximo": 60,
-        },
-        {
-            "id": 2,
-            "materia": 'Sociales',
-            "promedio": 90,
-            "desviacion": 80,
-            "valorMinimo": 70,
-            "valorMaximo": 60,
-        },
-        {
-            "id": 3,
-            "materia": 'Matematicas',
-            "promedio": 90,
-            "desviacion": 80,
-            "valorMinimo": 70,
-            "valorMaximo": 60,
-        },
-        {
-            "id": 4,
-            "materia": 'Lectura critica',
-            "promedio": 90,
-            "desviacion": 80,
-            "valorMinimo": 70,
-            "valorMaximo": 60,
+                'label': 'Bajo',
+                'data': [0, 20, 30, 40],
+                'backgroundColor': '#DC3D3D',
+              },
+              {
+                'label': 'Básico',
+                'data': [0, 20, 30, 40],
+                'backgroundColor': '#E27E1E',
+              },
+              {
+                'label': 'Alto',
+                'data': [0, 20, 30, 40],
+                'backgroundColor': 'rgba(241, 204, 48, 1)',
+              },
+                  {
+                'label': 'Superior',
+                'data': [0, 20, 30, 40],
+                'backgroundColor': 'rgba(146, 185, 59, 0.7)',
+              },
+            ]
           }
-        ]
-    
-    return {'columns': columns, 'rows': lista}
+        }
+      
+        #return {'columns': columns, 'rows': lista}
+      return 'prueba'
+    except Exception as e:
+      print(f'error {e}')
+      return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
   
-  def notes_by_competencies(self, code, year, test, grade, classroom, subject):
+  
+  def desviation_by_subject(self, code, year, test, grade, classroom, db):
 
-    columns = [
-        { 'headerName': 'Estudiante', 'field': 'estudiante', 
-        },
-        { 'headerName': 'Grado', 'field': 'grado', 
-        },
-        { 'headerName': 'Salón', 'field': 'salon', 
-        },
-        { 'headerName': 'Prueba', 'field': 'prueba', 
-        },
-        { 'headerName': 'Materia', 'field': 'materia', 
-        },
-        { 'headerName': 'Competencia', 'field': 'competencia', 
-        },
-        { 'headerName': 'Nota', 'field': 'nota', 
-        },
-        { 'headerName': 'Preguntas', 'field': 'preguntas', 
-        },
-      ]
+    procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Simulacros_DesviacionPorMaterias"
+  
+    try:
 
-    lista = [{
-            "id": 1,
-            "estudiante": 'Pedro Pérez',
-            "grado": 9,
-            "salon": 2,
-            "prueba": 'Prueba pensar',
-            "materia": 'Inglés',
-            "competencia": 'Comunicativa',
-            "nota": 4,
-            "preguntas": 20
-        },
-        {
-            "id": 2,
-            "estudiante": 'Pedro Martinez',
-            "grado": 9,
-            "salon": 2,
-            "prueba": 'Prueba pensar',
-            "materia": 'Inglés',
-            "competencia": 'Comunicativa',
-            "nota": 4,
-            "preguntas": 20
-        },
-        {
-            "id": 3,
-            "estudiante": 'Pedro Infante',
-            "grado": 9,
-            "salon": 2,
-            "prueba": 'Prueba pensar',
-            "materia": 'Inglés',
-            "competencia": 'Comunicativa',
-            "nota": 4,
-            "preguntas": 20
-        },
-        {
-            "id": 4,
-            "estudiante": 'Pedro Solano',
-            "grado": 9,
-            "salon": 2,
-            "prueba": 'Prueba pensar',
-            "materia": 'Inglés',
-            "competencia": 'Comunicativa',
-            "nota": 4,
-            "preguntas": 20
-        },  
-      ]
+      query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @Anno=:Anno, @Prueba=:Prueba, @Grado=:Grado, @Salon=:Salon")
+      result = db.execute(query, {"Codigo": code, "Anno": year, "Grado": grade, "Salon": classroom, "Prueba": test}).fetchall()
+      #print(result)
+      df = pl.DataFrame(result)
 
-    return {'columns': columns, 'rows': lista}
+      if len(result) != 0:
+
+        columns = [
+            { 'headerName': 'Materia', 'field': 'materia', 
+            },
+            { 'headerName': 'Promedio', 'field': 'promedio', 
+            },
+            { 'headerName': 'Desviación', 'field': 'desviacion', 
+            },
+            { 'headerName': 'Min. Valor', 'field': 'valorMinimo', 
+            },
+            { 'headerName': 'Max. Valor', 'field': 'valorMaximo', 
+            },
+          ]
+        
+        data = {
+                'Materia': df['column_0'].apply(lambda x: x[0]),
+                'Promedio': df['column_0'].apply(lambda x: x[1]),
+                'Desviación': df['column_0'].apply(lambda x: x[2]),
+                'Min. Valor': df['column_0'].apply(lambda x: x[3]),
+                'Max. Valor': df['column_0'].apply(lambda x: x[4]),
+                'ID': df['column_0'].apply(lambda x: x[5]),
+              }
+        
+        new_df = pd.DataFrame(data)
+        new_df = new_df.fillna(0)
+        new_df = new_df.to_dict(orient='records')
+
+        lista = []
+
+        for elemento in new_df:
+        
+            dicc = {
+                    "id": elemento['ID'],
+                    "materia": elemento['Materia'],
+                    "promedio": elemento['Promedio'],
+                    "desviacion": elemento['Desviación'],
+                    "valorMinimo": elemento['Min. Valor'],
+                    "valorMaximo": elemento['Max. Valor'],
+                  }
+        
+            lista.append(dicc)
+
+        return {'columns': columns, 'rows': lista}
+    except Exception as e:
+      print(f'error {e}')
+      return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
+  
+  def notes_by_competencies(self, code, year, test, grade, classroom, subject, ID_student, db):
+
+    procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Simulacros_NotasEstudiantesPorCompetencias"
+
+    try:
+
+      query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @Anno=:Anno, @Prueba=:Prueba, @Grado=:Grado, @Salon=:Salon, @CodigoMateria=:CodigoMateria, @IDestudiante=:IDestudiante")
+      result = db.execute(query, {"Codigo": code, "Anno": year, "Prueba": test, "Grado": grade, "Salon": classroom, "CodigoMateria": subject, "IDestudiante": ID_student}).fetchall()
+      print(result)
+      df = pl.DataFrame(result)
+
+      if len(result) != 0:
+
+        columns = [
+            { 'headerName': 'Estudiante', 'field': 'estudiante', 
+            },
+            { 'headerName': 'Grado', 'field': 'grado', 
+            },
+            { 'headerName': 'Salón', 'field': 'salon', 
+            },
+            { 'headerName': 'Prueba', 'field': 'prueba', 
+            },
+            { 'headerName': 'Materia', 'field': 'materia', 
+            },
+            { 'headerName': 'Competencia', 'field': 'competencia', 
+            },
+            { 'headerName': 'Nota', 'field': 'nota', 
+            },
+            { 'headerName': 'Preguntas', 'field': 'preguntas', 
+            },
+          ]
+
+
+
+        return 'prueba'
+        #return {'columns': columns, 'rows': lista}
+    except Exception as e:
+      print(f'error {e}')
+      return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
   
   def desviation_by_competencies(self, code, year, test, grade, classroom, subject):
 
