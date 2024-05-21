@@ -202,30 +202,42 @@ class Simulacros():
 
       if len(result) != 0:
         #print(result)
+
+        labels_list = []; Low_performance = []; basic_performance = []
+        high_performance = []; superior_performance = []
+        
+
+        for iterator in result:
+          labels_list.append(iterator[0])
+          Low_performance.append(iterator[2])
+          basic_performance.append(iterator[4])
+          high_performance.append(iterator[6])
+          superior_performance.append(iterator[8])
+
         data = {
           'totalStudents': 'number',
           'data': {
           'title': 'string',
-          'labels': ['Razonamiento', 'Conocimientos', 'Quimica', 'Fisica'],
+          'labels': labels_list,
           'datasets': [
               {
                 'label': 'Bajo',
-                'data': [0, 20, 30, 40],
+                'data': Low_performance,
                 'backgroundColor': '#DC3D3D',
               },
               {
                 'label': 'Básico',
-                'data': [0, 20, 30, 40],
+                'data': basic_performance,
                 'backgroundColor': '#E27E1E',
               },
               {
                 'label': 'Alto',
-                'data': [0, 20, 30, 40],
+                'data': high_performance,
                 'backgroundColor': 'rgba(241, 204, 48, 1)',
               },
                   {
                 'label': 'Superior',
-                'data': [0, 20, 30, 40],
+                'data': superior_performance,
                 'backgroundColor': 'rgba(146, 185, 59, 0.7)',
               },
             ]
@@ -233,7 +245,7 @@ class Simulacros():
         }
       
         #return {'columns': columns, 'rows': lista}
-      return 'prueba'
+      return data  
     except Exception as e:
       print(f'error {e}')
       return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
@@ -301,12 +313,12 @@ class Simulacros():
   def notes_by_competencies(self, code, year, test, grade, classroom, subject, ID_student, db):
 
     procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Simulacros_NotasEstudiantesPorCompetencias"
-
+    # FALTA ID
     try:
 
       query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @Anno=:Anno, @Prueba=:Prueba, @Grado=:Grado, @Salon=:Salon, @CodigoMateria=:CodigoMateria, @IDestudiante=:IDestudiante")
       result = db.execute(query, {"Codigo": code, "Anno": year, "Prueba": test, "Grado": grade, "Salon": classroom, "CodigoMateria": subject, "IDestudiante": ID_student}).fetchall()
-      print(result)
+      #print(result)
       df = pl.DataFrame(result)
 
       if len(result) != 0:
@@ -329,10 +341,40 @@ class Simulacros():
             { 'headerName': 'Preguntas', 'field': 'preguntas', 
             },
           ]
+        
+        data = {
+                'Estudiante': df['column_0'].apply(lambda x: x[0]),
+                'Grado': df['column_0'].apply(lambda x: x[1]),
+                'Salón': df['column_0'].apply(lambda x: x[2]),
+                'Prueba': df['column_0'].apply(lambda x: x[3]),
+                'Materia': df['column_0'].apply(lambda x: x[4]),
+                'Competencia': df['column_0'].apply(lambda x: x[5]),
+                'Nota': df['column_0'].apply(lambda x: x[6]),
+                'Preguntas': df['column_0'].apply(lambda x: x[7]),
+              }
+        
+        new_df = pd.DataFrame(data)
+        new_df = new_df.fillna(0)
+        new_df = new_df.to_dict(orient='records')
 
+        lista = []
 
+        for elemento in new_df:
+        
+            dicc = {
+                    "estudiante": elemento['Estudiante'],
+                    "grado": elemento['Grado'],
+                    "promedio": elemento['Salón'],
+                    "prueba": elemento['Prueba'],
+                    "materia": elemento['Materia'],
+                    "competencia": elemento['Competencia'],
+                    "nota": elemento['Nota'],
+                    "preguntas": elemento['Preguntas'],
+                  }
+        
+            lista.append(dicc)
 
-        return 'prueba'
+        return {'columns': columns, 'rows': lista}
         #return {'columns': columns, 'rows': lista}
     except Exception as e:
       print(f'error {e}')
